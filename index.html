@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="index.js"></script> -->
+    <script type="text/javascript" src="min.js">
+    </script>
+    <script src="chart.js"></script>
+    <title>Ping a server using JavaScript</title>
+</head>
+
+<body>
+    <form>
+        <label for="url">
+            Change the URL you want to ping:
+        </label><br>
+        <input type="text" id="url" name="url" style="margin: 10px;"><br>
+        <input type="submit" value="Submit" onclick="pingURL()">
+    </form>
+    <div>
+        <canvas id="myChart"></canvas>
+    </div>
+
+</body>
+
+<script>
+    // define the max number of ping results to display
+    const maxDisplayPings = 500;
+    const midPingWait = 1000;
+    let url;
+    // function to ping the server
+    function pingURL(url = null) {
+        if (!url) {
+            // set the url to google.com by default
+            // var url = "https://www.google.com";
+            var url = "http://localhost:5500";
+        };
+        console.log("Pinging " + url);
+        // make web request using XMLHttpRequest
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    console.log(xhr.status, "The server is up and running!");
+                    // console.log(xhr.responseText);
+                    // add the ping result to the chart
+                    var pingResult = 5
+                    addData(myChart, pingResult);
+                } else {
+                    console.log(xhr.status, "The server is down!");
+                    // add the ping result to the chart
+                    var pingResult = -5
+                    addData(myChart, pingResult);
+                }
+            }
+        }
+        xhr.send();
+
+    };
+
+    // generate an array of numbers from 0 to 500
+    // to represent the last 500 seconds / 3 minutes of ping times
+    var seconds = Array.from({
+        length: maxDisplayPings
+    }, (v, k) => k);
+    console.log(seconds);
+
+
+    // read local storage
+    var pingStats = localStorage.getItem("pingStats");
+    console.log('pingStats', pingStats);
+    if (pingStats == null) {
+        // set ping stats to empty object
+        pingStats = [];
+    } else {
+        // convert string to object
+        pingStats = JSON.parse(pingStats);
+    }
+
+
+    // set the chart context to the canvas element
+    var canvas = document.getElementById('myChart').getContext('2d');
+
+    // create the chart
+    var myChart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: seconds,
+            datasets: [{
+                label: 'Ping',
+                data: pingStats,
+                barThickness: 2,
+                barPercentage: 0.5,
+                backgroundColor: [
+                    'rgba(217, 30, 24, 1)'
+                ],
+                borderColor: [
+                    'rgba(217, 30, 24, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxis: {
+                    ticks: { min: -10, max: 10, stepSize: 1 },
+                },
+                xAxes: {
+                    ticks: {
+                        beginAtZero: true,
+                        max: maxDisplayPings,
+                    }
+                }
+            },
+            animation: {
+                duration: 0,
+            },
+        }
+    });
+
+    function addData(chart, data) {
+        // chart.data.labels.push(label);
+        chart.data.datasets.forEach((dataset) => {
+            // add the new data to the end of the array
+            dataset.data.push(data);
+            // update the labels so that the x-xis is rebuilt and re-assigned
+            chart.data.labels = seconds;
+            // get the current length of the data array
+            var length = dataset.data.length;
+            // check if the data is greater than the max value
+            if (length >= maxDisplayPings) {
+                // remove the first value
+                chart.data.datasets[0].data.shift();
+            }
+            // update local storage with the updated data
+            pingStats = dataset.data;
+            localStorage.setItem("pingStats", JSON.stringify(pingStats));
+        });
+        chart.update();
+    }
+
+    // make an infinite loop to ping the server
+    setInterval(function () {
+        var url = document.getElementById("url").value;
+        pingResult = pingURL(url);
+    }, midPingWait);
+
+
+</script>
+
+</html>
