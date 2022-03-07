@@ -13,14 +13,16 @@
 </head>
 
 <body>
+    <h1 style="text-align: center; color: blue;">Ping a server using JavaScript</h1>
     <div style="text-align: center; padding-bottom: 100px;" id="result">
         <label for="url">
             Change the URL you want to ping:
-        </label><br>
-        <input type="text" id="url" name="url" style="margin: 10px;"><br>
-        <input type="submit" value="Submit" onclick="pingUrlAndRecordStatus()">
+        </label>
+        <input type="text" id="url" name="url" style="margin: 10px; border-width: 2px; border-color: cyan;">
+        <a href="#" onclick="pingUrlAndRecordStatus()"
+            style=" border-width: 4px;border-color: aquamarine; text-align: center; width: 50px; background-color: aquamarine;">submit</a>
     </div>
-    
+
     <div>
         <canvas style="max-height: 400px;" id="myChart"></canvas>
     </div>
