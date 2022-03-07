@@ -53,6 +53,8 @@
     if (pingStats == null) {
         // set ping stats to empty object
         pingStats = [];
+        // update local storage with the initial data object
+        localStorage.setItem("pingStats", JSON.stringify(pingStats));
     } else {
         // convert string to object
         pingStats = JSON.parse(pingStats);
@@ -174,10 +176,6 @@
     function updateChartData(chart, data) {
         // get pingStats from local storage
         var pingStats = JSON.parse(localStorage.getItem("pingStats"));
-        if (pingStats == null) {
-            // set ping stats to empty object
-            pingStats = []
-        };
         // add the new ping result to the array
         pingStats.push(data);
         // check if the data is greater than the max value
