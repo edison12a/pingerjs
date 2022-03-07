@@ -174,6 +174,10 @@
     function updateChartData(chart, data) {
         // get pingStats from local storage
         var pingStats = JSON.parse(localStorage.getItem("pingStats"));
+        if (pingStats == null) {
+            // set ping stats to empty object
+            pingStats = []
+        };
         // add the new ping result to the array
         pingStats.push(data);
         // check if the data is greater than the max value
